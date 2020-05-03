@@ -4,7 +4,7 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
 $paths = [
-    __DIR__ . 'Entity'
+    __DIR__ . '\Entity'
 ];
 
 $isDevMode = true;
