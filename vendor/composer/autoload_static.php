@@ -30,6 +30,7 @@ class ComposerStaticInit22954538221da56b3af462355315c231
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Contracts\\Service\\' => 26,
             'Symfony\\Component\\Console\\' => 26,
+            'Slim\\Views\\' => 11,
         ),
         'P' => 
         array (
@@ -74,6 +75,10 @@ class ComposerStaticInit22954538221da56b3af462355315c231
         'Symfony\\Component\\Console\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
+        ),
+        'Slim\\Views\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/slim/php-view/src',
         ),
         'Psr\\Log\\' => 
         array (

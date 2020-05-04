@@ -3,6 +3,7 @@
 use Aura\Router\RouterContainer;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
+use Slim\Views\PhpRenderer;
 
 $request = ServerRequestFactory::fromGlobals(
     $_SERVER,
@@ -15,9 +16,13 @@ $request = ServerRequestFactory::fromGlobals(
 $routerConatiner = new RouterContainer();
 
 $map = $routerConatiner->getMap();
-$map->get('home', '/home', function($request, $response) {
-    $response->getBody()->write('Hello Word!');
-    return $response;
+
+$view = new PhpRenderer(__DIR__. '/../templates/');
+
+$map->get('home', '/home', function($request, $response) use ($view) {
+    return $view->render($response, 'home.phtml', [
+        'test' => 'Slim PHP View funcionando!'
+    ]);
 });
 
 $matcher = $routerConatiner->getMatcher();

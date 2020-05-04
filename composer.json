@@ -2,7 +2,8 @@
     "require": {
         "doctrine/orm": "2.5.*",
         "aura/router": "^3.1",
-        "zendframework/zend-diactoros": "^2.2"
+        "zendframework/zend-diactoros": "^2.2",
+        "slim/php-view": "^2.2"
     },
     "autoload": {
         "psr-4": {
