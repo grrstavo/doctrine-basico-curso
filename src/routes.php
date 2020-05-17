@@ -60,6 +60,36 @@ $map->post('categories.store', '/categories/store',
     }
 );
 
+$map->get('categories.edit', '/categories/{id}/edit',
+    function(ServerRequestInterface $request, $response) use ($view, $entityManager) {
+        $id = $request->getAttribute('id');
+        $repository = $entityManager->getRepository(Category::class);
+        $category = $repository->find($id);
+
+        return $view->render($response, 'categories/edit.phtml', [
+            'category' => $category
+        ]);
+    }
+);
+
+$map->post('categories.update', '/categories/{id}/update',
+    function (ServerRequestInterface $request, $response) use ($view, $entityManager, $generator) {
+        $id = $request->getAttribute('id');
+        $repository = $entityManager->getRepository(Category::class);
+
+        $data = $request->getParsedBody();
+
+        $category = $repository->find($id);
+        $category->setName($data['name']);
+
+        $entityManager->flush();
+
+        $uri = $generator->generate('categories.list');
+
+        return new Response\RedirectResponse($uri);
+    }
+);
+
 $matcher = $routerConatiner->getMatcher();
 $route = $matcher->match($request);
 
