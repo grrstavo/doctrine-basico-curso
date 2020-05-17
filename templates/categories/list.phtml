@@ -16,7 +16,10 @@
                         <tr>
                             <td><?php echo $category->getId(); ?></td>
                             <td><?php echo $category->getName(); ?></td>
-                            <td><?php echo "<a href='/categories/{$category->getId()}/edit'>Editar</a>" ?></td>
+                            <td>
+                                <?php echo "<a href='/categories/{$category->getId()}/edit'>Editar</a>" ?> | 
+                                <?php echo "<a href='/categories/{$category->getId()}/remove'>Excluir</a>" ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
