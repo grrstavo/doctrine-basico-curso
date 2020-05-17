@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
             <h3>Listagem de categorias</h3>
-            <a href="/categories/create">Nova categoria</a>
+            <a href="/categories/create">Nova Categoria</a>
             <table class="table">
                 <thead>
                 <tr>
@@ -11,10 +11,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td>Category</td>
-                    </tr>
+                    <?php foreach ($categories as $category): ?>
+                        <tr>
+                            <td><?php echo $category->getId(); ?></td>
+                            <td><?php echo $category->getName(); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

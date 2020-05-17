@@ -1,9 +1,11 @@
 <?php
 
+use App\Entity\Category;
 use Aura\Router\RouterContainer;
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Views\PhpRenderer;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
-use Slim\Views\PhpRenderer;
 
 $request = ServerRequestFactory::fromGlobals(
     $_SERVER,
@@ -15,9 +17,12 @@ $request = ServerRequestFactory::fromGlobals(
 
 $routerConatiner = new RouterContainer();
 
+$generator = $routerConatiner->getGenerator();
 $map = $routerConatiner->getMap();
 
 $view = new PhpRenderer(__DIR__. '/../templates/');
+
+$entityManager = getEntityManager();
 
 $map->get('home', '/home', function($request, $response) use ($view) {
     return $view->render($response, 'home.phtml', [
@@ -26,9 +31,34 @@ $map->get('home', '/home', function($request, $response) use ($view) {
 });
 
 
-$map->get('categories.list', '/categories', function($request, $response) use ($view) {
-    return $view->render($response, 'categories/list.phtml');
+$map->get('categories.list', '/categories', function($request, $response) use ($view, $entityManager) {
+    $repository = $entityManager->getRepository(Category::class);
+    $categories = $repository->findAll();
+
+    return $view->render($response, 'categories/list.phtml', [
+        'categories' => $categories
+    ]);
 });
+
+$map->get('categories.create', '/categories/create', function($request, $response) use ($view) {
+    return $view->render($response, 'categories/create.phtml');
+});
+
+$map->post('categories.store', '/categories/store',
+    function (ServerRequestInterface $request, $response) use ($view, $entityManager, $generator) {
+        $data = $request->getParsedBody();
+
+        $category = new Category();
+        $category->setName($data['name']);
+
+        $entityManager->persist($category);
+        $entityManager->flush();
+
+        $uri = $generator->generate('categories.list');
+
+        return new Response\RedirectResponse($uri);
+    }
+);
 
 $matcher = $routerConatiner->getMatcher();
 $route = $matcher->match($request);
@@ -44,4 +74,8 @@ $callable = $route->handler;
  */
 $response = $callable($request, new Response());
 
-echo $response->getBody();
+if ($response instanceof Response\RedirectResponse) {
+    header("location: {$response->getHeader("location")[0]}");
+} elseif ($response instanceof Response) {
+    echo $response->getBody();
+}
