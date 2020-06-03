@@ -1,6 +1,7 @@
 <?php
 
-use App\Entity\post;
+use App\Entity\Category;
+use App\Entity\Post;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
@@ -76,6 +77,45 @@ $map->get('posts.remove', '/posts/{id}/remove',
 
         $uri = $generator->generate('posts.list');
 
+        return new Response\RedirectResponse($uri);
+    }
+);
+
+$map->get('posts.categories', '/posts/{id}/categories',
+    function (ServerRequestInterface $request, $response) use ($view, $entityManager) {
+        $id = $request->getAttribute('id');
+        $repository = $entityManager->getRepository(Post::class);
+        $categoryRepository = $entityManager->getRepository(Category::class);
+
+        $categories = $categoryRepository->findAll();
+        $post = $repository->find($id);
+
+        return $view->render($response, 'posts/categories.phtml', [
+            'post' => $post,
+            'categories' => $categories
+        ]);
+    }
+);
+
+$map->post('posts.set-categories', '/posts/{id}/set-categories',
+    function (ServerRequestInterface $request, $response) use ($view, $entityManager, $generator) {
+        $id = $request->getAttribute('id');
+        $data = $request->getParsedBody();
+        $repository = $entityManager->getRepository(Post::class);
+        $categoryRepository = $entityManager->getRepository(Category::class);
+
+        /**@var Post post */
+        $post = $repository->find($id);
+        $post->getCategories()->clear();
+        $entityManager->flush();
+
+        foreach ($data['categories'] as $idCategory) {
+            $category = $categoryRepository->find($idCategory);
+            $post->addCategory($category);
+        }
+        $entityManager->flush();
+
+        $uri = $generator->generate('posts.list');
         return new Response\RedirectResponse($uri);
     }
 );
