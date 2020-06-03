@@ -1,6 +1,7 @@
 <?php
 
 use App\Entity\Category;
+use App\Entity\Post;
 use Aura\Router\RouterContainer;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Views\PhpRenderer;
@@ -24,9 +25,25 @@ $view = new PhpRenderer(__DIR__. '/../templates/');
 
 $entityManager = getEntityManager();
 
-$map->get('home', '/home', function($request, $response) use ($view) {
+$map->get('home', '/', function (ServerRequestInterface $request, $response) use ($view, $entityManager) {
+    $postsRepository = $entityManager->getRepository(Post::class);
+    $categoryRepository = $entityManager->getRepository(Category::class);
+    $categories = $categoryRepository->findAll();
+
+    $data = $request->getQueryParams();
+
+    if (isset($data['search']) && $data['search'] != "") {
+        $queryBuilder = $postsRepository->createQueryBuilder('p');
+        $queryBuilder->join('p.categories', 'c')
+            ->where($queryBuilder->expr()->eq('c.id', $data['search']));
+        $posts = $queryBuilder->getQuery()->getResult();
+    } else {
+        $posts = $postsRepository->findAll();
+    }
+
     return $view->render($response, 'home.phtml', [
-        'test' => 'Slim PHP View funcionando!'
+        'posts' => $posts,
+        'categories' => $categories
     ]);
 });
 
